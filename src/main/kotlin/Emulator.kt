@@ -9,13 +9,15 @@ class Emulator(
         rom.character.forEachIndexed { idx, data -> write(idx, data.toInt()) }
     }), canvas = canvas, interrupts = interrupts)
 
+    private val apu = Apu()
+
     private val ram = Ram(0x2048)
 
     private val dma = Dma(ppu, ram)
 
     private val cpu = Cpu(CpuBus(
             ppu,
-            Apu(),
+            apu,
             ram,
             ProgramRom(rom.program),
             dma,
@@ -33,6 +35,7 @@ class Emulator(
             }
             cycle += cpu.run()
             ppu.run(cycle * 3)
+            apu.run(cycle)
         }
     }
 }
